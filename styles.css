@@ -90,19 +90,23 @@
   border: 1px solid var(--background-modifier-border); border-radius: 8px;
   background: var(--background-secondary);
 }
+/* `display: table` is forced with !important only to survive "responsive table"
+   themes (e.g. Minimal) that set `table { display: block !important }`, which
+   would otherwise collapse the infobox rows. Every other property wins on
+   selector specificity, so no other !important is needed. */
 .zim-content .zim-ibx .infobox {
-  display: table !important; float: none !important;
-  width: 100% !important; max-width: 100% !important;
-  table-layout: fixed; border-collapse: collapse; margin: 0 !important;
+  display: table !important; float: none;
+  width: 100%; max-width: 100%;
+  table-layout: fixed; border-collapse: collapse; margin: 0;
   background: none; font-size: 0.85em; line-height: 1.45;
 }
 .zim-content .infobox table, .zim-content .ts-infobox {
-  display: table !important; float: none !important;
-  width: 100% !important; max-width: 100% !important; table-layout: fixed;
+  display: table !important; float: none;
+  width: 100%; max-width: 100%; table-layout: fixed;
   margin: 0; background: none;
 }
 .zim-content .infobox td, .zim-content .infobox th { padding: 4px 8px; vertical-align: top; text-align: left; overflow-wrap: anywhere; }
-.zim-content .infobox img { max-width: 100% !important; height: auto !important; }
+.zim-content .infobox img { max-width: 100%; height: auto; }
 .zim-content .infobox-image, .zim-content .infobox-image td, .zim-content .infobox-image th { text-align: center; }
 .zim-content .infobox-above, .zim-content .infobox caption { font-weight: 700; font-size: 1.1em; text-align: center; padding: 8px; }
 .zim-content .infobox-header, .zim-content .infobox-subheader,
