@@ -781,7 +781,7 @@ const WIKI_ICON = '<text x="50" y="82" text-anchor="middle" font-family="Georgia
 const ZIM_IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
 /* ---------- i18n: English by default, Russian when Obsidian language is ru ---------- */
-const RU = (typeof window !== 'undefined' && window.localStorage && window.localStorage.getItem('language') === 'ru');
+const RU = String(obsidian.moment.locale() || '').startsWith('ru');
 const T = RU ? {
   displayName: 'Читалка ZIM',
   openReader: 'Открыть читалку ZIM',
@@ -1354,7 +1354,7 @@ class ZimReaderView extends ItemView {
     const titleText = (entry.title.length ? entry.title : entry.url).toString('utf8');
     this.articleEl.createEl('h1', { cls: 'zim-title', text: titleText });
     const container = this.articleEl.createDiv('zim-content');
-    while (body.firstChild) container.appendChild(document.adoptNode(body.firstChild));
+    while (body.firstChild) container.appendChild(container.ownerDocument.adoptNode(body.firstChild));
 
     if (this.plugin.settings.hideApparatus) this.stripApparatus(container);
     this.layoutInfoboxes(container);
