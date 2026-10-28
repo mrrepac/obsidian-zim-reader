@@ -961,12 +961,25 @@ class ZimArchive {
     return e.redirect ? this.resolveEntry(e.redirectIndex, depth + 1) : e;
   }
 
+  // Byte length of cluster cn. The last cluster has no next pointer, and in
+  // modern ZIMs it is followed by the directory entries (gigabytes for full
+  // Wikipedia), so checksumPos is far too loose a bound there. An uncompressed
+  // cluster records its own size: the last entry of its blob-offset table.
+  clusterLength(cn, start) {
+    if (cn + 1 < this.header.clusterCount) return this.clusterOffset(cn + 1) - start;
+    const info = this.readAt(start, 1)[0];
+    if ((info & 0x0f) > 1) return this.header.checksumPos - start; // compressed: no cheap bound
+    const osz = (info & 0x10) ? 8 : 4;
+    const readOff = (pos) => (osz === 8 ? this.u64(this.readAt(pos, 8), 0) : this.readAt(pos, 4).readUInt32LE(0));
+    const first = readOff(start + 1);                 // offset table length in bytes
+    return 1 + readOff(start + 1 + first - osz);      // info byte + end of the last blob
+  }
+
   getCluster(cn) {
     const cached = this.clusterCache.get(cn);
     if (cached) { this.clusterCache.delete(cn); this.clusterCache.set(cn, cached); return cached; }
     const start = this.clusterOffset(cn);
-    const end = cn + 1 < this.header.clusterCount ? this.clusterOffset(cn + 1) : this.header.checksumPos;
-    const raw = this.readAt(start, end - start);
+    const raw = this.readAt(start, this.clusterLength(cn, start));
     const info = raw[0];
     const compression = info & 0x0f;
     const ext = (info & 0x10) !== 0;
